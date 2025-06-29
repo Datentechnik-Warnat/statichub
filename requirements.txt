@@ -1,0 +1,5 @@
+Flask==3.1.*
+docker==7.1.*
+pathlib==1.0.1
+gunicorn==23.0.0
+gevent==25.5.1

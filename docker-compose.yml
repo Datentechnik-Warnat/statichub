@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  flask-hugo-app:
+    build: .
+    container_name: flask-hugo-deployer
+    ports:
+      - "8080:8080"
+    volumes:
+      # Mount Docker socket for Docker-in-Docker
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Mount statichosts directory
+      - /statichosts/pages:/statichosts/pages
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-SuperSecret_25}
+      - TZ=Europe/Berlin
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+      - WEB_CONCURRENCY=1  # Override Gunicorn workers if needed
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - caddy
+
+networks:
+  caddy:
+    driver: bridge
